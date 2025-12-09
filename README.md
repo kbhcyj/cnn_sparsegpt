@@ -1,27 +1,101 @@
 # CNN SparseGPT Project
 
-이 프로젝트는 SparseGPT 논문(Frantar & Alistarh, 2023)과 내부 정리 자료를 토대로 OBS(Optimal Brain Surgeon) 기반 n:m 프루닝을 MNIST/CIFAR CNN 모델에 적용하는 예제입니다.
+이 프로젝트는 대규모 언어 모델(LLM)에 적용되던 **SparseGPT** 프루닝 알고리즘을 **CNN(Convolutional Neural Networks)**, 특히 **ResNet-18**과 **VGG-16** (CIFAR-10/MNIST) 모델에 적용하고 검증하는 구현체입니다.
 
-## 디렉터리 구조
-- `models/`: MNIST/CIFAR CNN 및 학습 설정
-- `data/`: 캘리브레이션/데이터 유틸리티
-- `pruning/`: OBS, 마스크, 파이프라인 로직
-- `configs/`: 예제 구성 파일(YAML)
-- `scripts/`: 실행 엔트리포인트 (예: `prune.py`)
-- `experiments/`: 실험 기록 및 리포트
-- `docs/`: SparseGPT/OBS 이론 정리
+Optimal Brain Surgeon (OBS) 프레임워크를 기반으로 가중치(Weight)의 중요도를 계산하고, 한 번의 패스(One-shot)로 모델을 경량화합니다.
 
-## 빠른 시작
+---
+
+## 📋 주요 기능
+
+- **OBS 기반 프루닝**: 2차 미분 정보(Hessian)를 활용한 정교한 가지치기
+- **구조적/비구조적 프루닝 지원**:
+    - **N:M Structured Pruning** (예: 2:4) - 하드웨어 가속에 유리
+    - **Unstructured Pruning** (Magnitude/SparseGPT) - 높은 압축률 가능
+- **다양한 모델 지원**: ResNet-18, VGG-16, Simple CNN
+- **자동화된 벤치마크**: 프루닝 전후의 정확도(Accuracy) 및 희소성(Sparsity) 비교
+
+---
+
+## 🛠️ 설치 및 환경 설정
+
+이 프로젝트는 Python 3.8+ 및 PyTorch 환경에서 실행됩니다.
+
+### 1. 저장소 클론
 ```bash
+git clone https://github.com/kbhcyj/cnn_sparsegpt.git
+cd cnn_sparsegpt
+```
+
+### 2. Conda 가상환경 생성 및 패키지 설치
+```bash
+# 가상환경 생성 (이미 pytorch 환경이 있다면 생략 가능)
+conda create -n pytorch python=3.10
 conda activate pytorch
 
-# 1. 베이스라인 모델 학습 (체크포인트 생성)
-python scripts/train_baseline.py --model resnet18_cifar --epochs 100 --save-path checkpoints/resnet18_cifar.pt
+# 필수 패키지 설치
+pip install -r requirements.txt
+```
 
-# 2. 프루닝 실행
+---
+
+## 🚀 사용 가이드
+
+### 1단계: 베이스라인 모델 준비
+프루닝을 수행하려면 먼저 학습된 모델(체크포인트)이 필요합니다. 제공된 스크립트로 직접 학습시킬 수 있습니다.
+
+```bash
+# CIFAR-10 ResNet-18 학습 (약 93~94% 정확도 목표)
+python scripts/train_baseline.py \
+    --model resnet18_cifar \
+    --epochs 100 \
+    --save-path checkpoints/resnet18_cifar.pt
+```
+> **참고**: 학습된 모델은 `checkpoints/` 폴더에 저장됩니다.
+
+### 2단계: 프루닝 실행 (Pruning)
+설정 파일(`configs/*.yaml`)을 사용하여 다양한 프루닝 실험을 진행할 수 있습니다.
+
+**예시 1: ResNet-18에 2:4 SparseGPT 적용**
+```bash
 python scripts/prune.py --config configs/exp_cifar_resnet18.yaml
 ```
 
-## 참고 문헌
-- SparseGPT: Massive Language Models Can be Accurately Pruned in One-Shot (arXiv:2301.00774)
-- SparseGPT Review Notes (docs/notes.md)
+**예시 2: 명령줄 인수로 직접 실행**
+```bash
+python scripts/prune.py \
+    --model resnet18_cifar \
+    --weights checkpoints/resnet18_cifar.pt \
+    --mode sparsegpt \
+    --sparsity 0.5 \
+    --n 2 --m 4
+```
+
+### 3단계: 결과 확인 및 시각화
+실험 결과는 `experiments/results`에 CSV 형태로 저장되며, 이를 시각화할 수 있습니다.
+
+```bash
+# 벤치마크 실행 및 결과 플로팅
+python scripts/run_benchmark.py
+python scripts/plot_benchmark.py
+```
+생성된 그래프는 `experiments/plots/` 디렉토리에서 확인할 수 있습니다.
+
+---
+
+## 📂 디렉토리 구조
+
+```text
+cnn_sparsegpt/
+├── checkpoints/    # 학습된 모델 가중치 저장소 (.gitignore)
+├── configs/        # 실험 설정 파일 (YAML)
+├── data/           # 데이터셋 및 캘리브레이션 로더
+├── docs/           # 프로젝트 문서 및 분석 보고서
+├── experiments/    # 실험 결과(logs, csv) 및 그래프
+├── models/         # CNN 모델 정의 (ResNet, VGG, SimpleCNN)
+├── pruning/        # 핵심 알고리즘 (SparseGPT, OBS, Masking)
+└── scripts/        # 실행 스크립트 (train, prune, benchmark)
+```
+
+## 📝 라이선스
+이 프로젝트는 MIT License를 따릅니다.
