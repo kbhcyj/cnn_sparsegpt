@@ -1,0 +1,17 @@
+weights: "checkpoints/cifar10_cnn.pt"
+data_dir: "data"
+batch_size: 128
+test_batch_size: 256
+num_workers: 4
+calib_batches: 8
+calib_samples: 1024
+n: 2
+m: 4
+lambd: 0.0001
+device: "cuda"
+output: "checkpoints/cifar10_pruned_magnitude.pt"
+mode: "magnitude"
+model: "cifar10"
+seed: 42
+enforce_nm: true
+
