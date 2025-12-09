@@ -14,7 +14,12 @@
 ## 빠른 시작
 ```bash
 conda activate pytorch
-python scripts/prune.py --config configs/mnist_obs.yaml
+
+# 1. 베이스라인 모델 학습 (체크포인트 생성)
+python scripts/train_baseline.py --model resnet18_cifar --epochs 100 --save-path checkpoints/resnet18_cifar.pt
+
+# 2. 프루닝 실행
+python scripts/prune.py --config configs/exp_cifar_resnet18.yaml
 ```
 
 ## 참고 문헌
