@@ -48,11 +48,12 @@ def elementwise_topk_mask(
 
     mask = np.zeros_like(weight, dtype=np.float32)
     rows, cols = weight.shape
-    keep_cols = max(1, int(round(cols * keep_ratio)))
+    keep_cols = max(1, int(round(cols * keep_ratio)))   # 각 행에서 살릴 개수 K
 
     for r in range(rows):
+        # 각 행(r)에서 중요도(importance)가 가장 높은 K개의 인덱스를 찾음
         idx = np.argpartition(importance[r], -keep_cols)[-keep_cols:]
-        mask[r, idx] = 1.0
+        mask[r, idx] = 1.0      # 살아남은 애들만 1로 표시
     return mask
 
 

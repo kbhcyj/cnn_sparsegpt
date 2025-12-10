@@ -140,8 +140,8 @@ def prune_layer_obs(
             
             # 마스크 적용 및 에러 계산
             # Error = w - mask(w)  (제거되는 값)
-            m_val = mask_block[:, i - c_start]
-            error = w * (1.0 - m_val)
+            m_val = mask_block[:, i - c_start]  # 현재 처리 중인 컬럼의 마스크 (0 또는 1)
+            error = w * (1.0 - m_val)           # 잘려나가는 값 (Mask가 0인 곳의 가중치 값)
             
             # 현재 가중치 프루닝 (0으로 만듦)
             weight_matrix[:, i] = w * m_val
@@ -153,7 +153,7 @@ def prune_layer_obs(
             
             if i + 1 < cols:
                 # correction term: Error / [H^{-1}]_{ii}
-                correction = error / d
+                correction = error / d      # 보정값 크기 계산 (d는 Hessian 역행렬 대각성분)
                 
                 # H^{-1} Row vector for future columns: H^{-1}_{i, i+1:}
                 h_inv_row = hessian_inv[i, i+1:] 
