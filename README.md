@@ -116,5 +116,109 @@ cnn_sparsegpt/
 └── scripts/        # 실행 스크립트 (train, prune, benchmark)
 ```
 
+## 📚 문서 (docs/)
+
+프로젝트의 상세 분석 및 기술 문서입니다.
+
+### 📖 종합 문서
+
+#### [comprehensive_analysis_report.md](docs/comprehensive_analysis_report.md) 🔥 추천
+> **프로젝트 전체를 빠르게 파악**하고 싶다면 이 문서를 먼저 읽으세요.
+
+- **프로젝트 개요**: 목적, 핵심 특징, 지원 모델 (MNIST, CIFAR-10, ResNet-18, VGG-16)
+- **아키텍처 분석**: 프로젝트 구조, 모듈 의존성 다이어그램
+- **핵심 알고리즘**: Hessian 계산, Cholesky 분해, OBS 프루닝, Adaptive Mask Selection
+- **N:M Sparsity CNN 적용**: Conv2d 4D→2D 변환, 마스크 생성, NVIDIA 가속 지원
+- **실험 결과**: 4개 모델 × 2개 방법 (Magnitude vs SparseGPT) 비교표
+- **기술 Q&A**: 자주 묻는 질문 3가지 정리
+- **결론 및 향후 방향**
+
+---
+
+### 📐 알고리즘 분석
+
+#### [algorithm_detailed_analysis.md](docs/algorithm_detailed_analysis.md)
+> **수식과 코드의 1:1 대응**을 이해하고 싶다면 이 문서를 읽으세요.
+
+| 섹션 | 내용 |
+|------|------|
+| Hessian 계산 | $H = XX^\top/N$ + Adaptive Dampening 상세 |
+| 역행렬 계산 | Cholesky 분해 $H = LL^\top$ 사용 이유 |
+| OBS 프루닝 | 에러 점수 $\varepsilon_j = w_j^2/[H^{-1}]_{jj}$, 보정 업데이트 |
+| Adaptive Mask | 블록별 동적 마스크 재계산 메커니즘 |
+| N:M 마스크 | `nm_mask_blockwise`, `elementwise_topk_mask` 구현 |
+| 수식-코드 대응표 | 논문 수식 ↔ Python 코드 매핑 |
+
+#### [algorithm_analysis.md](docs/algorithm_analysis.md)
+> **알고리즘 전체 흐름**을 그림으로 이해하고 싶다면 이 문서를 읽으세요.
+
+- OBS 프레임워크 개요
+- 레이어별 프루닝 흐름 다이어그램
+- 블록 단위 Adaptive Mask Selection 시각화
+- 참고 문헌 목록
+
+---
+
+### 🔧 구현 분석
+
+#### [implementation_details.md](docs/implementation_details.md)
+> **공식 SparseGPT 구현체와의 차이점**을 알고 싶다면 이 문서를 읽으세요.
+
+- 공식 구현체 (LLM용) vs CNN_SparseGPT 비교
+- Hessian 계산 방식 차이 (4D 텐서 처리)
+- Fast Approximate Reconstruction 구현
+- Conv2d → 2D 행렬 변환 (Im2Col 관점)
+- Batch Normalization 처리 방법
+
+#### [implementation_analysis.md](docs/implementation_analysis.md)
+- 코드 구조 분석
+- 주요 함수별 역할 설명
+- 데이터 흐름 분석
+
+---
+
+### 📊 실험 결과
+
+#### [benchmark_analysis_full.md](docs/benchmark_analysis_full.md)
+> **실험 결과 상세**를 보고 싶다면 이 문서를 읽으세요.
+
+| 모델 | Magnitude | SparseGPT | **SparseGPT 우위** |
+|------|-----------|-----------|-------------------|
+| MNIST | 97.33% | 98.20% | +0.87%p |
+| CIFAR-10 | 45.48% | 64.64% | +19.16%p |
+| ResNet-18 | 20.75% | 46.17% | +25.42%p |
+| VGG-16 | 31.16% | 67.91% | +36.75%p |
+
+#### [benchmark_analysis.md](docs/benchmark_analysis.md)
+- 기본 벤치마크 결과 요약
+- 정확도-희소성 트레이드오프 분석
+
+---
+
+### 📝 기타 문서
+
+#### [model_extension.md](docs/model_extension.md)
+> **새로운 모델을 추가**하고 싶다면 이 문서를 읽으세요.
+
+- `MODEL_REGISTRY` 등록 방법
+- 새 모델 클래스 작성 가이드
+- 데이터 로더 연결 방법
+
+#### [notes.md](docs/notes.md)
+- 개발 중 메모 및 TODO
+- 실험 아이디어 기록
+
+---
+
+### 🚀 문서 추천 가이드
+
+| 목적 | 추천 문서 |
+|------|----------|
+| **프로젝트 전체 파악** | [comprehensive_analysis_report.md](docs/comprehensive_analysis_report.md) |
+| **알고리즘 수식 이해** | [algorithm_detailed_analysis.md](docs/algorithm_detailed_analysis.md) |
+| **실험 결과 확인** | [benchmark_analysis_full.md](docs/benchmark_analysis_full.md) |
+| **코드 구현 이해** | [implementation_details.md](docs/implementation_details.md) |
+| **새 모델 추가** | [model_extension.md](docs/model_extension.md) |
+
 ## 📝 라이선스
 이 프로젝트는 MIT License를 따릅니다.
